@@ -1,0 +1,3 @@
+[submodule "gumbo-get-element-by-id.c"]
+	path = gumbo-get-element-by-id.c
+	url = https://github.com/stephenmathieson/gumbo-get-element-by-id.c
