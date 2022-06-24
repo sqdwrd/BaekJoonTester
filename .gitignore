@@ -56,3 +56,5 @@ dkms.conf
 .vscode/
 ProblemPage/
 .DS_Store
+cmake-build-*
+.idea
