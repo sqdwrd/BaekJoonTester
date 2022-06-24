@@ -112,10 +112,10 @@ int gethtml() {
     return 0;
 }
 
-char * readfile(char fpath[]) {
+char *readfile(char fpath[]) {
     long size;
-    char * file;
-    FILE * fp;
+    char *file;
+    FILE *fp;
 
     fp = fopen(fpath, "r");
 //    fseek(fp, 0, SEEK_END);
@@ -128,11 +128,15 @@ char * readfile(char fpath[]) {
     return file;
 }
 
-void eofnewline(char * str) {
+void eofnewline(char *str) {
     for (int i = 0; 1; i++) {
         if (*(str + i) == 0 && *(str + i - 1) != '\n') {
-            *(str + i) = '\n';
-            *(str + i + 1) = 0;
+            if (*(str + i - 1) == '\r') {
+                *(str + i - 1) = '\n';
+            } else {
+                *(str + i) = '\n';
+                *(str + i + 1) = 0;
+            }
             break;
         }
     }
@@ -174,9 +178,7 @@ int test(char argv[128]) {
 
 
         // 확인
-        sprintf(cmd, "diff  %s ./ProblemPage/%d/%d.usrout", fpath, ProblemNum, exampleNum + 1);
-
-        char * usrout, * out;
+        char *usrout, *out;
 
         sprintf(fpath, "ProblemPage/%d/%d.out", ProblemNum, exampleNum + 1);
         out = readfile(fpath);
