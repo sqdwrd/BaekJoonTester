@@ -118,11 +118,11 @@ char *readfile(char fpath[]) {
     FILE *fp;
 
     fp = fopen(fpath, "r");
-//    fseek(fp, 0, SEEK_END);
-//    size = ftell(fp);
+    fseek(fp, 0, SEEK_END);
+    size = ftell(fp);
 
-    file = malloc(128);
-//    fseek(fp, 0, SEEK_SET);
+    file = malloc(size + 8);
+    fseek(fp, 0, SEEK_SET);
     fread(file, 1, 512, fp);
     fclose(fp);
     return file;
