@@ -112,13 +112,38 @@ int gethtml() {
     return 0;
 }
 
+char * readfile(char fpath[]) {
+    long size;
+    char * file;
+    FILE * fp;
+
+    fp = fopen(fpath, "r");
+//    fseek(fp, 0, SEEK_END);
+//    size = ftell(fp);
+
+    file = malloc(128);
+//    fseek(fp, 0, SEEK_SET);
+    fread(file, 1, 512, fp);
+    fclose(fp);
+    return file;
+}
+
+void eofnewline(char * str) {
+    for (int i = 0; 1; i++) {
+        if (*(str + i) == 0 && *(str + i - 1) != '\n') {
+            *(str + i) = '\n';
+            *(str + i + 1) = 0;
+            break;
+        }
+    }
+}
+
 
 int test(char argv[128]) {
     FILE *fp;
     int exampleNum;
     char fpath[32], cmd[128];
-    _Bool isInput = true;
-    char in[MAX_LEN];
+    char incorrect = -1;
     int totalExNum;
 
 
@@ -149,17 +174,27 @@ int test(char argv[128]) {
 
 
         // 확인
-        sprintf(fpath, "ProblemPage/%d/%d.out", ProblemNum, exampleNum + 1);
         sprintf(cmd, "diff  %s ./ProblemPage/%d/%d.usrout", fpath, ProblemNum, exampleNum + 1);
-        if (system(cmd)) {
+
+        char * usrout, * out;
+
+        sprintf(fpath, "ProblemPage/%d/%d.out", ProblemNum, exampleNum + 1);
+        out = readfile(fpath);
+        sprintf(fpath, "ProblemPage/%d/%d.usrout", ProblemNum, exampleNum + 1);
+        usrout = readfile(fpath);
+
+        eofnewline(out);
+        eofnewline(usrout);
+
+        if (strcmp(out, usrout)) {
             printf("%d번: 틀렸습니다\n", exampleNum + 1);
-            return 1;
+            incorrect = 1;
         } else {
             printf("%d번: 맞았습니다\n", exampleNum + 1);
-            return 0;
+            incorrect = 0;
         }
     }
-    return -1;
+    return incorrect;
 }
 
 int main(int argc, char *argv[]) {
