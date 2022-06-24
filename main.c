@@ -26,7 +26,7 @@ int gethtml() {
 
     // url의 페이지 다운로드
     char outf[64];
-    printf("%s\n", url);
+    printf("다운로드 및 분석 중: %s\n", url);
 
     CURL *curl = curl_easy_init();
 
@@ -88,10 +88,6 @@ int gethtml() {
                     sampleGumbo->v.element.original_tag.data + sampleGumbo->v.element.original_tag.length,
                     size);
 
-            strcat(example, "\n");
-
-            printf("%s\n____________________\n", example);
-
             sprintf(outf, "ProblemPage/%d/%d.%s", ProblemNum, exampleNum + 1, isInput ? "in" : "out");
 
             fp = fopen(outf, "w");
@@ -117,7 +113,7 @@ int gethtml() {
 }
 
 
-int test(char argv [128]) {
+int test(char argv[128]) {
     FILE *fp;
     int exampleNum;
     char fpath[32], cmd[128];
@@ -139,27 +135,31 @@ int test(char argv [128]) {
     totalExNum = atoi(buf);
     if (!totalExNum) {
         printf("입출력이 없습니다. 문제 번호를 제대로 입력했는지 확인하십시오");
-        return 1;
+        return -1;
     }
 
 
     for (exampleNum = 0; exampleNum < totalExNum; exampleNum++) {
 
-            // 테스트 출력
-            sprintf(fpath, "ProblemPage/%d/%d.in", ProblemNum, exampleNum + 1);
-            sprintf(cmd, "cat %s | %s > ./ProblemPage/%d/%d.usrout", fpath, argv, ProblemNum, exampleNum + 1);
-            printf("%s", cmd);
+        // 테스트 출력
+        sprintf(fpath, "ProblemPage/%d/%d.in", ProblemNum, exampleNum + 1);
+        sprintf(cmd, "cat %s | %s > ./ProblemPage/%d/%d.usrout", fpath, argv, ProblemNum, exampleNum + 1);
 
-            system(cmd);
+        system(cmd);
 
 
-            // 확인
-            sprintf(fpath, "ProblemPage/%d/%d.out", ProblemNum, exampleNum + 1);
-        sprintf(cmd, "diff %s ./ProblemPage/%d/%d.usrout", fpath, ProblemNum, exampleNum + 1);
-            if (system(cmd)) {
-                printf("%d번: 틀렸습니다\n", exampleNum + 1);
-            } else printf("%d번: 맞았습니다\n", exampleNum + 1);
+        // 확인
+        sprintf(fpath, "ProblemPage/%d/%d.out", ProblemNum, exampleNum + 1);
+        sprintf(cmd, "diff  %s ./ProblemPage/%d/%d.usrout", fpath, ProblemNum, exampleNum + 1);
+        if (system(cmd)) {
+            printf("%d번: 틀렸습니다\n", exampleNum + 1);
+            return 1;
+        } else {
+            printf("%d번: 맞았습니다\n", exampleNum + 1);
+            return 0;
+        }
     }
+    return -1;
 }
 
 int main(int argc, char *argv[]) {
