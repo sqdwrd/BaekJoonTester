@@ -200,7 +200,10 @@ int test(char argv[128]) {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc < 3) printf("인수가 적습니다.\n ./BaekJoonTester {문제 번호} {프로그램 실행 명령}");
+    if (argc < 3) {
+        printf("인수가 적습니다.\n ./BaekJoonTester {문제 번호} {프로그램 실행 명령}");
+        return 1;
+    }
     ProblemNum = atoi(argv[1]);
 
     char executable[128] = {0,};
