@@ -128,20 +128,56 @@ char *readfile(char fpath[]) {
     return file;
 }
 
-void eofnewline(char *str) {
-    for (int i = 0; 1; i++) {
-        if (*(str + i) == 0 && *(str + i - 1) != '\n') {
-            if (*(str + i - 1) == '\r') {
-                *(str + i - 1) = '\n';
-            } else {
-                *(str + i) = '\n';
-                *(str + i + 1) = 0;
-            }
-            break;
+char *unifycrlf(char *string) {
+    // 교체할 개수 세기
+    unsigned int toReplace = 0;
+    for (int i = 0; i < strlen(string); i++) {
+        if (*(string + i) == '\r') {
+            if (*(string + i + 1) == '\n') continue;
+            else toReplace++;
+        } else if (*(string + i) == '\n') {
+            if (*(string + i + -1) == '\r') continue;
+            toReplace++;
         }
     }
-}
 
+    char *replaced = malloc(strlen(string) + toReplace + 2);
+    char *replPtr = replaced, *strPtr = string;
+
+    // 통일
+    for (int i = 0; i < strlen(string); i++) {
+        if (*(strPtr) == '\r' && *(strPtr + 1) == '\n') {
+            *(replPtr++) = '\r';
+            *(replPtr++) = '\n';
+            strPtr++;
+            strPtr++;
+        } else if (*(strPtr) == '\r') {
+            *(replPtr++) = '\r';
+            *(replPtr++) = '\n';
+            strPtr++;
+        } else if (*(strPtr) == '\n' && *(strPtr - 1) != '\r') {
+            *(replPtr++) = '\r';
+            *(replPtr++) = '\n';
+            strPtr++;
+        } else {
+            *(replPtr++) = *(strPtr++);
+        }
+    }
+
+    // EOF에 \r\n 삽입
+    char *ptr = replaced;
+    while (1) {
+        if (*(ptr) == 0 && *(ptr - 1) != '\n') {
+            *(ptr) = '\r';
+            *(++ptr) = '\n';
+            *(++ptr) = 0;
+            break;
+        }
+        ptr++;
+    }
+
+    return replaced;
+}
 
 int test(char argv[128]) {
     FILE *fp;
@@ -185,8 +221,8 @@ int test(char argv[128]) {
         sprintf(fpath, "ProblemPage/%d/%d.usrout", ProblemNum, exampleNum + 1);
         usrout = readfile(fpath);
 
-        eofnewline(out);
-        eofnewline(usrout);
+        out = unifycrlf(out);
+        usrout = unifycrlf(usrout);
 
         if (strcmp(out, usrout)) {
             printf("%d번: 틀렸습니다\n", exampleNum + 1);
