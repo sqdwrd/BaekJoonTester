@@ -10,18 +10,6 @@
 #define MAX_LEN 65536
 
 
-// OS 감지
-#ifdef _WIN32
-    #define OS 'w'
-#elifdef _WIN64
-    #define OS 'w'
-#elifdef __linux__
-    #define OS 'l'
-#elifdef __APPLE__
-    #define OS 'a'
-#endif
-
-
 int ProblemNum;
 
 size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
@@ -43,9 +31,17 @@ int gethtml() {
     CURL *curl = curl_easy_init();
 
     if (curl) {
+#if defined(_WIN32) || defined(_WIN64)
+        mkdir("ProblemPage");
+#else
         mkdir("ProblemPage", 0777);
+#endif
         sprintf(outf, "ProblemPage/%d", ProblemNum);
+#if defined(_WIN32) || defined(_WIN64)
+        mkdir(outf);
+#else
         mkdir(outf, 0777);
+#endif
         sprintf(outf, "ProblemPage/%d/problem.html", ProblemNum);
         FILE *fp = fopen(outf, "w");
 
@@ -219,8 +215,13 @@ int test(char argv[128]) {
     for (exampleNum = 0; exampleNum < totalExNum; exampleNum++) {
 
         // 테스트 출력
-        if (OS == 'l' || OS == 'a') sprintf(cmd, "cat ProblemPage/%d/%d.in | %s > ./ProblemPage/%d/%d.usrout", ProblemNum, exampleNum, fpath, argv, ProblemNum, exampleNum + 1);
-        else if (OS == 'w') sprintf(cmd, "text ProblemPage\\%d\\%d.in | %s > .\\ProblemPage\\%d\\%d.usrout", ProblemNum, exampleNum, fpath, argv, ProblemNum, exampleNum + 1);
+#if defined(_WIN32) || defined(_WIN64)
+        sprintf(cmd, "text ProblemPage\\%d\\%d.in | %s > .\\ProblemPage\\%d\\%d.usrout", ProblemNum, exampleNum,
+                fpath, argv, ProblemNum, exampleNum + 1);
+#else
+        sprintf(cmd, "cat ProblemPage/%d/%d.in | %s > ./ProblemPage/%d/%d.usrout", ProblemNum, exampleNum, fpath,
+                argv, ProblemNum, exampleNum + 1);
+#endif
 
         system(cmd);
 
