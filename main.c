@@ -50,6 +50,12 @@ int gethtml() {
 
 
     // 다운받은 페이지 파싱
+    parsefile()
+
+    return 0;
+}
+
+void parsefile() {
     FILE *fp = fopen(outf, "r");
     char doc[MAX_LEN];
     fread(doc, 1, MAX_LEN, fp);
@@ -108,8 +114,6 @@ int gethtml() {
             break;
         }
     }
-
-    return 0;
 }
 
 char *readfile(char fpath[]) {
